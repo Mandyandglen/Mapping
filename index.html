@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Earthquakes past 7 days</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v0.47.0/mapbox-gl.css' rel='stylesheet' />
+    <link href='https://www.mapbox.com/base/latest/base.css' rel='stylesheet' />
+    <style>
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    #locations {
+      position: absolute;
+    }
+    </style>
+</head>
+
+<body>
+    <style>
+        .mapboxgl-popup {
+            max-width: 400px;
+            font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        }
+.legend label,
+.legend span {
+  display:block;
+  float:left;
+  height:15px;
+  width:20%;
+  text-align:center;
+  font-size:9px;
+  color:#808080;
+   }
+        
+</style>
+
+<div id='map'></div>
+    
+      
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFuZHlhbmRnbGVuIiwiYSI6ImNqbGg5aWZvcDB3dGkzdnAxM3JsaTBkaGQifQ.n-QPvPm1hhY1pDJkYWCGbw'; // Put your Mapbox Public Access token here
+
+    // Load a new map in the 'map' HTML div
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mandyandglen/cjlo5gz0v5l8o2rlu3fyr4spb',
+      center: [-85.701707, 30.012298],
+      zoom: 2
+   
+    });
+    
+   
+    // Load the vector tile source from the Custom Mapbox 
+    map.on('load', function() {
+    map.addLayer({
+    id: 'mandyandglen.cjlo2i7v62b5o2wpfwd2tp3d7-6xbcg',
+    type: 'circle',
+    source: {
+      type: 'vector',
+      url: 'mandyandglen.cjlo2i7v62b5o2wpfwd2tp3d7-6xbcg' // This points to the style sheet URL
+    },
+   
+    // name of tilesets
+    'source-layer': 'earthquaketile',
+    paint: {
+      'circle-color': '#D49A66',
+      // Add data-driven styles for circle radius - points to "MAG" in JSONfile
+      'circle-radius': {
+        property: 'Mag',
+        type: 'linear',
+
+      },
+     
+    }
+   
+  });
+});
+   
+  
+    var popup = new mapboxgl.Popup({closeOnClick: false})
+    .setLngLat([-86, 57.8])
+    .setHTML('<h3> Global earthquake data past 7 days<h>   <p> (click on circle for more detail -size and color of circle indicates magnitude)</p>')
+    .addTo(map);
+
+ map.on('click', function(e) {
+  var features = map.queryRenderedFeatures(e.point, {
+    layers: ['earthquaketile'] 
+  });
+
+  if (!features.length) {
+    return;
+  }
+
+  var feature = features[0];
+
+  var popup = new mapboxgl.Popup({ offset: [0, -15] })
+    .setLngLat(feature.geometry.coordinates)
+    .setHTML('<h3>' + feature.properties.title )
+    .setLngLat(feature.geometry.coordinates)
+    .addTo(map);
+
+});
+
+    
+    </script>
+</body>
+
+</html>
